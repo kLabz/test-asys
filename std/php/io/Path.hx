@@ -22,34 +22,66 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package haxe;
+package php.io;
 
-class Log {
+class Path {
 
-	public static dynamic function trace( v : Dynamic, ?infos : PosInfos ) : Void {
-		#if flash
-		untyped flash.Boot.__trace(v,infos);
-		#elseif neko
-		untyped __dollar__print(infos.fileName+":"+infos.lineNumber+": ",v,"\n");
-		#elseif js
-		untyped js.Boot.__trace(v,infos);
-		#elseif php
-		untyped php.Boot.__trace(v,infos);
-		#end
+	public var ext : String;
+	public var dir : String;
+	public var file : String;
+	public var backslash : Bool;
+
+	public function new( path : String ) {
+		var c1 = path.lastIndexOf("/");
+		var c2 = path.lastIndexOf("\\");
+		if( c1 < c2 ) {
+			dir = path.substr(0,c2);
+			path = path.substr(c2+1);
+			backslash = true;
+		} else if( c2 < c1 ) {
+			dir = path.substr(0,c1);
+			path = path.substr(c1+1);
+		} else
+			dir = null;
+		var cp = path.lastIndexOf(".");
+		if( cp != -1 ) {
+			ext = path.substr(cp+1);
+			file = path.substr(0,cp);
+		} else {
+			ext = null;
+			file = path;
+		}
 	}
 
-	public static dynamic function clear() : Void {
-		#if flash
-		untyped flash.Boot.__clear_trace();
-		#elseif js
-		untyped js.Boot.__clear_trace();
-		#end
+	public function toString() {
+		return (if( dir == null ) "" else dir + if( backslash ) "\\" else "/") + file + (if( ext == null ) "" else "." + ext);
 	}
 
-	#if flash
-	public static dynamic function setColor( rgb : Int ) {
-		untyped flash.Boot.__set_trace_color(rgb);
+	public static function withoutExtension( path : String ) {
+		var s = new Path(path);
+		s.ext = null;
+		return s.toString();
 	}
-	#end
+
+	public static inline function withoutDirectory( path : String) : String  {
+		return untyped __call__("basename", path);
+	}
+
+	public static inline function directory( path : String) : String {
+		return untyped __call__("dirname", path);
+	}
+
+	public static function extension( path ) {
+		var s = new Path(path);
+		if( s.ext == null )
+			return "";
+		return s.ext;
+	}
+
+	public static function withExtension( path, ext ) {
+		var s = new Path(path);
+		s.ext = ext;
+		return s.toString();
+	}
 
 }

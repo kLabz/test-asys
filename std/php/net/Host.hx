@@ -21,35 +21,39 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
+ *
  */
-package haxe;
+package php.net;
 
-class Log {
 
-	public static dynamic function trace( v : Dynamic, ?infos : PosInfos ) : Void {
-		#if flash
-		untyped flash.Boot.__trace(v,infos);
-		#elseif neko
-		untyped __dollar__print(infos.fileName+":"+infos.lineNumber+": ",v,"\n");
-		#elseif js
-		untyped js.Boot.__trace(v,infos);
-		#elseif php
-		untyped php.Boot.__trace(v,infos);
-		#end
+class Host {
+
+	private var _ip : String;
+	public var ip(default,null) : haxe.Int32;
+
+	public function new( name : String ) {
+		if(~/^(\d{1,3}\.){3}\d{1,3}$/.match(name)) {
+		  _ip = name;
+		} else {
+			_ip = untyped __call__('gethostbyname', name);
+			if(_ip == name) {
+				ip = haxe.Int32.ofInt(0);
+				return;
+			}
+		}
+		var p = _ip.split('.');
+		ip = haxe.Int32.ofInt(untyped __call__('intval', __call__('sprintf', '%02X%02X%02X%02X', p[3], p[2], p[1], p[0]), 16));
 	}
 
-	public static dynamic function clear() : Void {
-		#if flash
-		untyped flash.Boot.__clear_trace();
-		#elseif js
-		untyped js.Boot.__clear_trace();
-		#end
+	public function toString() : String {
+		return _ip;
 	}
 
-	#if flash
-	public static dynamic function setColor( rgb : Int ) {
-		untyped flash.Boot.__set_trace_color(rgb);
+	public function reverse() : String {
+		return untyped __call__('gethostbyaddress', _ip);
 	}
-	#end
 
+	public static function localhost() : String {
+		return untyped __var__('_SERVER', 'HTTP_HOST');
+	}
 }
