@@ -22,34 +22,17 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package haxe;
+package php.db;
 
-class Log {
+interface Connection {
 
-	public static dynamic function trace( v : Dynamic, ?infos : PosInfos ) : Void {
-		#if flash
-		untyped flash.Boot.__trace(v,infos);
-		#elseif neko
-		untyped __dollar__print(infos.fileName+":"+infos.lineNumber+": ",v,"\n");
-		#elseif js
-		untyped js.Boot.__trace(v,infos);
-		#elseif php
-		untyped php.Boot.__trace(v,infos);
-		#end
-	}
-
-	public static dynamic function clear() : Void {
-		#if flash
-		untyped flash.Boot.__clear_trace();
-		#elseif js
-		untyped js.Boot.__clear_trace();
-		#end
-	}
-
-	#if flash
-	public static dynamic function setColor( rgb : Int ) {
-		untyped flash.Boot.__set_trace_color(rgb);
-	}
-	#end
-
+	function request( s : String ) : ResultSet;
+	function close() : Void;
+	function escape( s : String ) : String;
+	function quote( s : String ) : String;
+	function lastInsertId() : Int;
+	function dbName() : String;
+	function startTransaction() : Void;
+	function commit() : Void;
+	function rollback() : Void;
 }

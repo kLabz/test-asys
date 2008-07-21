@@ -22,34 +22,41 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package haxe;
+package php.net;
 
-class Log {
+typedef SocketInput = php.io.FileInput;
 
-	public static dynamic function trace( v : Dynamic, ?infos : PosInfos ) : Void {
-		#if flash
-		untyped flash.Boot.__trace(v,infos);
-		#elseif neko
-		untyped __dollar__print(infos.fileName+":"+infos.lineNumber+": ",v,"\n");
-		#elseif js
-		untyped js.Boot.__trace(v,infos);
-		#elseif php
-		untyped php.Boot.__trace(v,infos);
-		#end
+/*
+import php.net.Socket;
+import haxe.io.Error;
+class SocketInput extends haxe.io.Input {
+
+	var __s : SocketHandle;
+
+	public function new(s) {
+		__s = s;
 	}
 
-	public static dynamic function clear() : Void {
-		#if flash
-		untyped flash.Boot.__clear_trace();
-		#elseif js
-		untyped js.Boot.__clear_trace();
-		#end
+	public override function readByte() {
+		var r = untyped __call__('socket_read', __s, 1);
+		untyped Socket.checkError(r);
+		if(r == 0) return throw new haxe.io.Eof();
+		return untyped __call__('ord', r);
 	}
 
-	#if flash
-	public static dynamic function setColor( rgb : Int ) {
-		untyped flash.Boot.__set_trace_color(rgb);
+	public override function readBytes( buf : haxe.io.Bytes, pos : Int, len : Int ) : Int {
+		var r : String = untyped __call__('socket_read', __s, len);
+		untyped Socket.checkError(r);
+		var b = haxe.io.Bytes.ofString(r);
+		if(r.length == 0) return throw new haxe.io.Eof();
+		s.blit(pos, b, 0, r.length);
+		return r.length;
 	}
-	#end
 
+	public override function close() {
+		super.close();
+		if( __s != null ) untyped __call__('socket_close', __s);
+	}
 }
+
+*/
