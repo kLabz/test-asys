@@ -20,18 +20,27 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package python.internal;
+package eval.vm;
 
-@:ifFeature("has_throw")
-@:native("_HxException")
-class HxException extends python.Exceptions.Exception {
-	@:ifFeature("has_throw")
-	public var val:Dynamic;
+import sys.net.Socket;
 
-	@:ifFeature("has_throw")
-	public function new(val:Dynamic) {
-		var message = UBuiltins.str(val);
-		super(message);
-		this.val = val;
-	}
+extern class NativeSocket {
+	function new():Void;
+	function accept():NativeSocket;
+	function bind(host:Int, port:Int):Void;
+	function close():Void;
+	function connect(host:Int, port:Int):Void;
+	function host():{ip:Int, port:Int};
+	function listen(connections:Int):Void;
+	function peer():{ip:Int, port:Int};
+	function receive(buf:haxe.io.Bytes, pos:Int, len:Int):Int;
+	function receiveChar():Int;
+	function send(buf:haxe.io.Bytes, pos:Int, len:Int):Int;
+	function sendChar(char:Int):Void;
+	function setFastSend(b:Bool):Void;
+	function setTimeout(timeout:Float):Void;
+	function shutdown(read:Bool, write:Bool):Void;
+
+	static function select(read:Array<Socket>, write:Array<Socket>, others:Array<Socket>,
+		?timeout:Float):{read:Array<Socket>, write:Array<Socket>, others:Array<Socket>};
 }
