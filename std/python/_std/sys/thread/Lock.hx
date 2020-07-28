@@ -20,25 +20,23 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/**
-	`Any` is a type that is compatible with any other in both ways.
+package sys.thread;
 
-	This means that a value of any type can be assigned to `Any`, and
-	vice-versa, a value of `Any` type can be assigned to any other type.
+@:forward(release)
+abstract Lock(NativeSemaphore) {
+	public inline function new() {
+		this = new NativeSemaphore(0);
+	}
 
-	It's a more type-safe alternative to `Dynamic`, because it doesn't
-	support field access or operators and it's bound to monomorphs. So,
-	to work with the actual value, it needs to be explicitly promoted
-	to another type.
-**/
-@:forward.variance
-abstract Any(Dynamic) {
-	@:noCompletion @:to extern inline function __promote<T>():T
-		return this;
+	public inline function wait(?timeout:Float):Bool {
+		return this.acquire(true, timeout);
+	}
+}
 
-	@:noCompletion @:from extern inline static function __cast<T>(value:T):Any
-		return cast value;
-
-	@:noCompletion extern inline function toString():String
-		return Std.string(this);
+@:pythonImport("threading", "Semaphore")
+@:native("Lock")
+private extern class NativeSemaphore {
+	function new(value:Int);
+	function acquire(blocking:Bool = true, ?timeout:Float):Bool;
+	function release():Void;
 }

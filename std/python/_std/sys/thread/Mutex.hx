@@ -20,25 +20,26 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/**
-	`Any` is a type that is compatible with any other in both ways.
+package sys.thread;
 
-	This means that a value of any type can be assigned to `Any`, and
-	vice-versa, a value of `Any` type can be assigned to any other type.
+@:forward("release")
+abstract Mutex(NativeRLock) {
+	inline public function new() {
+		this = new NativeRLock();
+	}
 
-	It's a more type-safe alternative to `Dynamic`, because it doesn't
-	support field access or operators and it's bound to monomorphs. So,
-	to work with the actual value, it needs to be explicitly promoted
-	to another type.
-**/
-@:forward.variance
-abstract Any(Dynamic) {
-	@:noCompletion @:to extern inline function __promote<T>():T
-		return this;
+	inline public function acquire():Void {
+		this.acquire(true);
+	}
 
-	@:noCompletion @:from extern inline static function __cast<T>(value:T):Any
-		return cast value;
+	inline public function tryAcquire():Bool {
+		return this.acquire(false);
+	}
+}
 
-	@:noCompletion extern inline function toString():String
-		return Std.string(this);
+@:pythonImport("threading", "RLock")
+extern class NativeRLock {
+	function new():Void;
+	function acquire(blocking:Bool):Bool;
+	function release():Void;
 }
