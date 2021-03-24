@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2019 Haxe Foundation
+ * Copyright (C)2005-2021 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,30 +20,37 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package cpp;
+package cs;
 
-@:coreType @:notNull @:runtimeValue abstract Int64 from Int {
+import haxe.Rest;
+
+/**
+	Generate C# syntax not directly supported by Haxe.
+	Use only at low-level when specific target-specific code-generation is required.
+**/
+@:noClosure
+extern class Syntax {
+	/**
+		Inject `code` directly into generated source.
+
+		`code` must be a string constant.
+
+		Additional `args` are supported to provide code interpolation, for example:
+		```haxe
+		Syntax.code("System.Console.WriteLine({0} + {1})", "hi", 42);
+		```
+		will generate
+		```haxe
+		System.Console.WriteLine("hi" + 42);
+		```
+
+		Emits a compilation error if the count of `args` does not match the count of placeholders in `code`.
+	**/
+	static function code(code:String, args:Rest<Dynamic>):Dynamic;
 
 	/**
-		Destructively cast to Int
+		Inject `code` directly into generated source.
+		The same as `cs.Syntax.code` except this one does not provide code interpolation.
 	**/
-	public inline function toInt():Int {
-		return cast this;
-	}
-
-	@:to
-	@:deprecated("Implicit cast from Int64 to Int (32 bits) is deprecated. Use .toInt() or explicitly cast instead.")
-	inline function implicitToInt(): Int {
-		return toInt();
-	}
-
-	@:to
-	#if !cppia inline #end function toInt64():haxe.Int64 {
-		return cast this;
-	}
-
-	@:from
-	static #if !cppia inline #end function ofInt64(x:haxe.Int64):Int64 {
-		return cast x;
-	}
+	static function plainCode(code:String):Dynamic;
 }

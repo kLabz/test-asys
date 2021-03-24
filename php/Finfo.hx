@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2019 Haxe Foundation
+ * Copyright (C)2005-2021 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,30 +20,17 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package cpp;
+package php;
 
-@:coreType @:notNull @:runtimeValue abstract Int64 from Int {
+import haxe.extern.EitherType;
 
-	/**
-		Destructively cast to Int
-	**/
-	public inline function toInt():Int {
-		return cast this;
-	}
-
-	@:to
-	@:deprecated("Implicit cast from Int64 to Int (32 bits) is deprecated. Use .toInt() or explicitly cast instead.")
-	inline function implicitToInt(): Int {
-		return toInt();
-	}
-
-	@:to
-	#if !cppia inline #end function toInt64():haxe.Int64 {
-		return cast this;
-	}
-
-	@:from
-	static #if !cppia inline #end function ofInt64(x:haxe.Int64):Int64 {
-		return cast x;
-	}
+/**
+	@see https://www.php.net/manual/en/class.finfo.php
+**/
+@:native("finfo")
+extern class Finfo {
+	function new(?flags: Int, magic_database: String = "");
+	function buffer(string: String, ?flags: Int, ?context:Resource): EitherType<String, Bool>;
+	function file(filename: String, ?flags: Int, ?context:Resource): EitherType<String, Bool>;
+	function set_flags(flags: Int): Bool;
 }
